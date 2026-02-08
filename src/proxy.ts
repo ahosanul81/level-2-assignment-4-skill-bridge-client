@@ -3,6 +3,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { user } from "./services/user/user"; // server-safe Better Auth wrapper
 
 export async function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Skip middleware for verify-email route
+  if (pathname.startsWith("/verify-email")) {
+    return NextResponse.next();
+  }
+
+  // Check for session token in cookies
+  const sessionToken = request.cookies.get("better-auth.session_token");
+
+  //* User is not authenticated at all
+  if (!sessionToken) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   try {
     const { data } = await user.getSession();
 

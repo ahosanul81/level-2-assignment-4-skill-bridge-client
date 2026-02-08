@@ -50,6 +50,7 @@ export default function BookingTutorButton({
     // console.log(payload);
     try {
       const res = await bookingSessingAction(payload);
+      console.log(res)
       if (res.data.success) {
         toast.success(res.data.message);
       } else {
