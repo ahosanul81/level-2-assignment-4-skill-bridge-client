@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import z from "zod";
 import { useForm } from "@tanstack/react-form";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
 const formSchema = z.object({
   email: z.email(),
   password: z.string(),
@@ -27,8 +28,6 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const { data } = authClient.useSession();
-  console.log("user", data);
   const form = useForm({
     defaultValues: {
       email: "",
@@ -41,16 +40,16 @@ export function LoginForm({
       // const res = await auth.login(value);
       const { data, error } = await authClient.signIn.email({
         email: value.email,
-        password: value.password, // required
+        password: value.password,
         rememberMe: true,
-        callbackURL: "http://localhost:3000/",
+        // callbackURL: "https://skill-bridge-pi-ten.vercel.app",
       });
       console.log(data);
-      // if (res.data.id) {
-      //   toast.success("Logged in successfully");
-      // } else {
-      //   toast.error(res.error?.message);
-      // }
+      if (data?.token) {
+        toast.success("Logged in successfully");
+      } else {
+        toast.error(error?.message);
+      }
     },
   });
 

@@ -1,16 +1,13 @@
 const login = async (payload: { email: string; password: string }) => {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_AUTH_URL}/sign-in/email`,
-      {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(payload),
-        cache: "no-store",
+    const res = await fetch(`/sign-in/email`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
       },
-    );
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
 
     const data = await res.json();
     return { data: data.user, error: null };
@@ -22,7 +19,7 @@ const login = async (payload: { email: string; password: string }) => {
 
 const getSession = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}/get-session`, {
+    const res = await fetch(`/get-session`, {
       method: "GET",
       headers: {
         "content-type": "application/json",
