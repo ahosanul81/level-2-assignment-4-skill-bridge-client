@@ -1,9 +1,8 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { TTutor } from "@/types/tutor";
-import { Button } from "@/components/ui/button";
 import { UpdateProfileModal } from "./UpdateProfileModal";
 
 type TutorProfileProps = {
@@ -16,7 +15,7 @@ export default function TutorProfileCard({ tutor }: TutorProfileProps) {
       {/* Tutor Info */}
       <Card>
         <CardHeader>
-          <CardTitle>{tutor.name || "Unnamed"}</CardTitle>
+          <CardTitle>Tutor Info</CardTitle>
         </CardHeader>
         <CardContent className="flex space-x-4">
           <Avatar className="w-25 h-25 ">
@@ -27,6 +26,7 @@ export default function TutorProfileCard({ tutor }: TutorProfileProps) {
             />
           </Avatar>
           <div className="space-y-1">
+            <p className="text-2xl font-bold">{tutor.name || "Unnamed"}</p>
             <p className="text-gray-600">{tutor.bio}</p>
             <p className="text-gray-600">
               <span className="font-semibold">Role:</span> {tutor.user?.role}

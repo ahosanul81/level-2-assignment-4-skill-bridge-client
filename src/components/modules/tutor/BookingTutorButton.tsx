@@ -2,6 +2,7 @@
 import { bookingSessingAction } from "@/actions/bookingAction";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
+import { useUser } from "@/providers/UserProvider";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -14,7 +15,7 @@ export default function BookingTutorButton({
     tutorId: string;
   };
 }) {
-  const session = authClient.useSession();
+  const user = useUser();
   const [loading, setLoading] = useState(false);
 
   const handleBooking = async () => {
@@ -36,13 +37,13 @@ export default function BookingTutorButton({
       return;
     }
 
-    if (!session.data?.user.id) {
+    if (!user?.id) {
       toast.error("User not found");
       return;
     }
 
     const payload = {
-      studentId: session.data.user.id,
+      studentId: user?.id,
       categoryId,
       slotId,
       tutorId,
@@ -50,7 +51,7 @@ export default function BookingTutorButton({
     // console.log(payload);
     try {
       const res = await bookingSessingAction(payload);
-      console.log(res)
+      console.log(res);
       if (res.data.success) {
         toast.success(res.data.message);
       } else {

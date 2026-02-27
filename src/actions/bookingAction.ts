@@ -13,9 +13,7 @@ export const bookingSessingAction = async (payload: {
   tutorId: string;
 }) => {
   try {
-    const cookieStore = (await cookies()).get(
-      "better-auth.session_token",
-    )?.value;
+    const cookieStore = await cookies();
 
     const res = await fetch(
       `${process.env.BACKEND_BASE_URL}/booking/booking-session`,
@@ -23,7 +21,7 @@ export const bookingSessingAction = async (payload: {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Cookie: `better-auth.session_token=${cookieStore}`,
+          Cookie: cookieStore.toString(),
         },
         body: JSON.stringify(payload),
         cache: "no-store",
@@ -43,13 +41,13 @@ export const bookingSessingAction = async (payload: {
 };
 
 export const getAllBookingAction = async () => {
-  const cookieStore = (await cookies()).get("better-auth.session_token")?.value;
+  const cookieStore = await cookies();
   try {
     const res = await fetch(`${process.env.BACKEND_BASE_URL}/booking`, {
       method: "GET",
       headers: {
         "content-type": "application/json",
-        Cookie: `better-auth.session_token=${cookieStore}`,
+        Cookie: cookieStore.toString(),
       },
     });
 
@@ -65,7 +63,7 @@ export const bookingStatusUpdate = async (
   bookingId: string,
   payload: { status: TBooking["status"] },
 ) => {
-  const cookieStore = (await cookies()).get("better-auth.session_token")?.value;
+  const cookieStore = await cookies();
   const url = new URL(
     `${process.env.BACKEND_BASE_URL}/booking/booking-session/update/${bookingId}`,
   );
@@ -74,7 +72,7 @@ export const bookingStatusUpdate = async (
       method: "PATCH",
       headers: {
         "content-type": "application/json",
-        Cookie: `better-auth.session_token=${cookieStore}`,
+        Cookie: cookieStore.toString(),
       },
       next: { tags: ["bookingStatusTag"] },
       body: JSON.stringify(payload),

@@ -2,10 +2,12 @@
 "use server";
 import { TUpdateUser } from "@/types/user";
 import { cookies } from "next/headers";
+
 function removeEmptyKeys<T extends Record<string, any>>(obj: T): Partial<T> {
   return Object.fromEntries(
     Object.entries(obj).filter(
-      ([_, value]) => value !== "" && value !== null && value !== undefined,
+      ([_, value]) =>
+        value !== "" && value !== null && value !== undefined && value !== 0,
     ),
   ) as Partial<T>;
 }
@@ -14,7 +16,6 @@ export const updateUserAction = async (
   payload: TUpdateUser,
 ) => {
   const filterdPayload = removeEmptyKeys(payload);
-
   try {
     const cookieStore = await cookies();
     const res = await fetch(
@@ -25,6 +26,7 @@ export const updateUserAction = async (
           "content-type": "application/json",
           Cookie: cookieStore.toString(),
         },
+        // credentials: "include",
         body: JSON.stringify(filterdPayload),
         cache: "no-store",
       },

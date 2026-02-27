@@ -1,76 +1,51 @@
 // src/middleware.ts
+
 import { NextRequest, NextResponse } from "next/server";
-import { user } from "./services/user/user"; // server-safe Better Auth wrapper
+import { jwtVerify } from "jose";
+
+const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN_SECRET!);
 
 export async function proxy(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
+  const token = request.cookies.get("accessToken")?.value;
 
-  // Skip middleware for verify-email route
-  if (pathname.startsWith("/verify-email")) {
-    return NextResponse.next();
-  }
-
-  // Check for session token in cookies
-  const sessionToken = request.cookies.get(
-    "__Secure-better-auth.session_token",
-  );
-
-  //* User is not authenticated at all
-  if (!sessionToken) {
+  if (!token) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
   try {
-    const { data } = await user.getSession();
+    const { payload } = await jwtVerify(token, secret);
 
-    // If no user, redirect to login
-    if (!data?.user) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-
-    // Role-based redirects for dashboard root
     const pathname = request.nextUrl.pathname;
 
+    // ✅ Redirect root dashboard by role
     if (pathname === "/dashboard") {
-      if (data.user.role === "ADMIN") {
+      if (payload.role === "ADMIN") {
         return NextResponse.redirect(
           new URL("/dashboard/admin/bookings", request.url),
         );
-      } else if (data.user.role === "TUTOR") {
+      }
+
+      if (payload.role === "TUTOR") {
         return NextResponse.redirect(
           new URL("/dashboard/tutor/bookings", request.url),
         );
-      } else {
-        return NextResponse.redirect(new URL("/login", request.url));
       }
     }
 
-    // Optional: protect all dashboard routes
-    if (pathname.startsWith("/dashboard")) {
-      if (
-        data.user.role === "ADMIN" &&
-        pathname.startsWith("/dashboard/admin")
-      ) {
-        return NextResponse.next();
-      } else if (
-        data.user.role === "TUTOR" &&
-        pathname.startsWith("/dashboard/tutor")
-      ) {
-        return NextResponse.next();
-      } else {
-        return NextResponse.redirect(new URL("/login", request.url));
-      }
+    // ✅ Role-based protection
+    if (pathname.startsWith("/dashboard/admin") && payload.role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // For other routes, allow
+    if (pathname.startsWith("/dashboard/tutor") && payload.role !== "TUTOR") {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
     return NextResponse.next();
-  } catch (err) {
-    console.error("Proxy middleware error:", err);
+  } catch (error) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 }
-
-// Only run middleware on dashboard routes
 export const config = {
-  matcher: ["/dashboard/:path*"], // protects all /dashboard routes
+  matcher: ["/dashboard/:path*"],
 };

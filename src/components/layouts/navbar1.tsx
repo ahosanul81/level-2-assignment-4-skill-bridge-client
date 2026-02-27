@@ -24,9 +24,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "./ThemeToggle";
-import { authClient } from "@/lib/auth-client";
-import { toast } from "sonner";
 import Image from "next/image";
+import { useUser } from "@/providers/UserProvider";
 
 interface MenuItem {
   title: string;
@@ -46,7 +45,7 @@ interface Navbar1Props {
     className?: string;
   };
   menu?: MenuItem[];
-  auth?: {
+  authUrl?: {
     login: {
       title: string;
       url: string;
@@ -66,16 +65,14 @@ const Navbar1 = ({
     title: "Shadcnblocks.com",
   },
 
-  auth = {
+  authUrl = {
     login: { title: "Login", url: "/login" },
     signup: { title: "Sign up", url: "/signup" },
   },
   className,
 }: Navbar1Props) => {
-  const { data, error } = authClient.useSession();
-  if (error) {
-    toast.error(error.message);
-  }
+  const user = useUser();
+
   return (
     <section className={cn("bg-[#031F42]  text-white", className)}>
       <div className="  w-[90%] mx-auto">
@@ -95,16 +92,18 @@ const Navbar1 = ({
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            {!data && (
+
+            {!user && (
               <div className="text-black">
                 <Button asChild variant="outline" size="sm">
-                  <a href={auth.login.url}>{auth.login.title}</a>
+                  <a href={authUrl.login.url}>{authUrl.login.title}</a>
                 </Button>
                 <Button asChild size="sm">
-                  <a href={auth.signup.url}>{auth.signup.title}</a>
+                  <a href={authUrl.signup.url}>{authUrl.signup.title}</a>
                 </Button>
               </div>
             )}
+
             <Facebook />
             <Instagram />
             <Linkedin />
@@ -150,15 +149,16 @@ const Navbar1 = ({
                   >
                     {menu.map((item) => renderMobileMenuItem(item))}
                   </Accordion> */}
-
-                  <div className="flex flex-col gap-3">
-                    <Button asChild variant="outline">
-                      <a href={auth.login.url}>{auth.login.title}</a>
-                    </Button>
-                    <Button asChild>
-                      <a href={auth.signup.url}>{auth.signup.title}</a>
-                    </Button>
-                  </div>
+                  {!user && (
+                    <div className="flex flex-col gap-3">
+                      <Button asChild variant="outline">
+                        <a href={authUrl.login.url}>{authUrl.login.title}</a>
+                      </Button>
+                      <Button asChild>
+                        <a href={authUrl.signup.url}>{authUrl.signup.title}</a>
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>

@@ -25,10 +25,9 @@ import {
 
 import { category } from "@/services/category/category";
 import { slot } from "@/services/slot/slot";
-
-import { authClient } from "@/lib/auth-client";
 import { updateUserAction } from "@/actions/userUpdateAction";
 import { toast } from "sonner";
+import { useUser } from "@/providers/UserProvider";
 
 const profileSchema = z
   .object({
@@ -44,8 +43,8 @@ const profileSchema = z
   });
 
 export function UpdateProfileModal() {
-  const { data } = authClient.useSession();
-  //   if (!data) return;
+  const user = useUser();
+
   const form = useForm({
     defaultValues: {
       name: "",
@@ -62,11 +61,11 @@ export function UpdateProfileModal() {
 
     onSubmit: async ({ value }) => {
       //   console.log("SUBMITTED DATA:", value);
-      if (!data) {
+      if (!user) {
         return;
       }
 
-      const res = await updateUserAction(data?.user?.id, value);
+      const res = await updateUserAction(user?.id, value);
 
       if (res.data.success) {
         toast.success(res.data.message);
@@ -75,9 +74,10 @@ export function UpdateProfileModal() {
       }
     },
   });
-
+  // if (!user) return;
   const [categories, setCategories] = useState([]);
   const [slots, setSlots] = useState([]);
+  const isAdmin = user?.role === "ADMIN";
 
   useEffect(() => {
     (async () => {
@@ -112,96 +112,102 @@ export function UpdateProfileModal() {
                 </Field>
               )}
             </form.Field>
+            {!isAdmin && (
+              <>
+                <form.Field name="hourlyRate">
+                  {(field) => (
+                    <Field>
+                      <FieldLabel>Hourly Rate</FieldLabel>
+                      <Input
+                        type="number"
+                        value={field.state.value}
+                        onChange={(e) =>
+                          field.handleChange(Number(e.target.value))
+                        }
+                      />
+                    </Field>
+                  )}
+                </form.Field>
+                <form.Field name="experienceYear">
+                  {(field) => (
+                    <Field>
+                      <FieldLabel>Experience</FieldLabel>
+                      <Input
+                        type="number"
+                        value={field.state.value}
+                        onChange={(e) =>
+                          field.handleChange(Number(e.target.value))
+                        }
+                      />
+                    </Field>
+                  )}
+                </form.Field>
 
-            <form.Field name="hourlyRate">
-              {(field) => (
-                <Field>
-                  <FieldLabel>Hourly Rate</FieldLabel>
-                  <Input
-                    type="number"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(Number(e.target.value))}
-                  />
-                </Field>
-              )}
-            </form.Field>
+                <form.Field name="categoryId">
+                  {(field) => (
+                    <Field>
+                      <FieldLabel>Category</FieldLabel>
+                      <Select
+                        value={field.state.value}
+                        onValueChange={field.handleChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map((c: { id: string; name: string }) => (
+                            <SelectItem key={c.id} value={c.id}>
+                              {c.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  )}
+                </form.Field>
 
-            <form.Field name="experienceYear">
-              {(field) => (
-                <Field>
-                  <FieldLabel>Experience</FieldLabel>
-                  <Input
-                    type="number"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(Number(e.target.value))}
-                  />
-                </Field>
-              )}
-            </form.Field>
+                <form.Field name="slotId">
+                  {(field) => (
+                    <Field>
+                      <FieldLabel>Slot</FieldLabel>
+                      <Select
+                        value={field.state.value}
+                        onValueChange={field.handleChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select slot" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {slots.map(
+                            (s: {
+                              id: string;
+                              startTime: string;
+                              endTime: string;
+                            }) => (
+                              <SelectItem key={s.id} value={s.id}>
+                                {s.startTime} - {s.endTime}
+                              </SelectItem>
+                            ),
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  )}
+                </form.Field>
 
-            <form.Field name="categoryId">
-              {(field) => (
-                <Field>
-                  <FieldLabel>Category</FieldLabel>
-                  <Select
-                    value={field.state.value}
-                    onValueChange={field.handleChange}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((c: { id: string; name: string }) => (
-                        <SelectItem key={c.id} value={c.id}>
-                          {c.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-              )}
-            </form.Field>
-
-            <form.Field name="slotId">
-              {(field) => (
-                <Field>
-                  <FieldLabel>Slot</FieldLabel>
-                  <Select
-                    value={field.state.value}
-                    onValueChange={field.handleChange}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select slot" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {slots.map(
-                        (s: {
-                          id: string;
-                          startTime: string;
-                          endTime: string;
-                        }) => (
-                          <SelectItem key={s.id} value={s.id}>
-                            {s.startTime} - {s.endTime}
-                          </SelectItem>
-                        ),
-                      )}
-                    </SelectContent>
-                  </Select>
-                </Field>
-              )}
-            </form.Field>
-
-            <form.Field name="bio">
-              {(field) => (
-                <Field className="md:col-span-2">
-                  <FieldLabel>Bio</FieldLabel>
-                  <Textarea
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </Field>
-              )}
-            </form.Field>
+                <form.Field name="bio">
+                  {(field) => (
+                    <Field className="md:col-span-2">
+                      <FieldLabel>Bio</FieldLabel>
+                      <Textarea
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                    </Field>
+                  )}
+                </form.Field>
+              </>
+            )}
 
             <Button type="submit" className="md:col-span-2 w-full">
               Save Changes

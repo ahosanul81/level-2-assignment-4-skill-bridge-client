@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import { SignOutButton } from "../logOut/LogoutButton";
-import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
+import { useUser } from "@/providers/UserProvider";
 
 export function ProfileDropdown() {
-  const session = authClient.useSession();
+  const user = useUser();
 
   return (
     <DropdownMenu>
@@ -33,7 +33,7 @@ export function ProfileDropdown() {
         <DropdownMenuGroup>
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuItem>
-            <Link href={`/profile/${session.data?.user.id}`}>Profile</Link>
+            <Link href={`/profile/${user?.id}`}>Profile</Link>
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem>

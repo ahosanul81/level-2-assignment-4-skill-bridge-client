@@ -9,14 +9,14 @@ import { Star } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner"; // optional but recommended
 import { addReviewAction } from "@/actions/reviewAction";
-import { authClient } from "@/lib/auth-client";
+import { useUser } from "@/providers/UserProvider";
 
 type AddReviewProps = {
   tutorId: string;
 };
 
 export default function AddReview({ tutorId }: AddReviewProps) {
-  const session = authClient.useSession();
+  const user = useUser();
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -25,7 +25,7 @@ export default function AddReview({ tutorId }: AddReviewProps) {
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      if (!session.data) {
+      if (!user) {
         toast.error("session not found");
         return;
       }
@@ -43,7 +43,7 @@ export default function AddReview({ tutorId }: AddReviewProps) {
         return;
       }
       const payload = {
-        userId: session.data?.user.id,
+        userId: user?.id,
         tutorId: tutorId,
         rating: rating,
         comment: comment,

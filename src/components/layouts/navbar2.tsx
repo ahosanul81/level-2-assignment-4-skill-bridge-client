@@ -31,6 +31,8 @@ import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import { toast } from "sonner";
 import { ProfileDropdown } from "../modules/profile/ProfileDropdown";
+import { auth } from "@/services/auth/auth";
+import { useUser } from "@/providers/UserProvider";
 
 interface MenuItem {
   title: string;
@@ -88,11 +90,8 @@ const Navbar2 = ({
 
   className,
 }: Navbar2Props) => {
-  const { data, error } = authClient.useSession();
+  const user = useUser();
 
-  if (error) {
-    toast.error(error.message);
-  }
   // const { email, name, id, isActive, role, status }: IUser = data?.user;
   return (
     <section className={cn("py-4 ", className)}>
@@ -133,8 +132,7 @@ const Navbar2 = ({
               {menu.map((item) => renderMenuItem(item))}
             </NavigationMenuList>
           </NavigationMenu>
-
-          {data && data?.user && (
+          {user && user && (
             <>
               <ProfileDropdown />
             </>

@@ -10,6 +10,7 @@ const addReview = async (payload: {
       headers: {
         "content-type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(payload),
     });
 

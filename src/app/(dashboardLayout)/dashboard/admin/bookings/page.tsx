@@ -8,7 +8,7 @@ export default async function BookingAdminPage() {
   //   console.log(res);
   return (
     <div>
-      <BookingTable booking={res.data.data} />
+      <BookingTable booking={res.data.data || []} />
     </div>
   );
 }
