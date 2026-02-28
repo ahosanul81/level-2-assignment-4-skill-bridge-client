@@ -12,7 +12,7 @@ const bookingSessing = async (payload: {
         headers: {
           "content-type": "application/json",
         },
-
+        credentials: "include",
         body: JSON.stringify(payload),
       },
     );
@@ -31,6 +31,7 @@ const getAllBooking = async () => {
       headers: {
         "content-type": "application/json",
       },
+      credentials: "include",
       next: { tags: ["bookingStatusTag"] },
     });
 

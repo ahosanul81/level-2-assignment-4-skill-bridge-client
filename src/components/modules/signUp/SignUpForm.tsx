@@ -31,6 +31,7 @@ import {
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { signUpAction } from "@/actions/userAction";
+import { user } from "@/services/user/user";
 const formSchema = z.object({
   name: z.string(),
   email: z.email(),
@@ -55,13 +56,13 @@ export function SignUpForm({
     },
     onSubmit: async ({ value }) => {
       // const res = await auth.login(value);
-      const res = await signUpAction({
+      const res = await user.signUp({
         ...value,
         name: value.email?.split("@")[0],
       });
       console.log(res);
       if (res) {
-        toast.success("Logged in successfully");
+        toast.success("Signed up successfully");
         const { data, error } = await authClient.signIn.email({
           email: value.email,
           password: value.password, // required

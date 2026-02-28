@@ -1,5 +1,5 @@
 import { TUpdateUser } from "@/types/user";
-import { cookies } from "next/headers";
+// import { cookies } from "next/headers";
 
 const getSpecificUser = async (userId: string) => {
   try {
@@ -7,6 +7,7 @@ const getSpecificUser = async (userId: string) => {
       `${process.env.NEXT_PUBLIC_BASE_URL}/user/${userId}`,
       {
         method: "GET",
+        credentials: "include",
         cache: "no-store",
       },
     );
@@ -18,30 +19,17 @@ const getSpecificUser = async (userId: string) => {
     return { data: null, error: { message: "Something went wrong" } };
   }
 };
-const getSession = async () => {
-  try {
-    const cookieStore = await cookies();
-    const res = await fetch(`${process.env.AUTH_URL}/get-session`, {
-      headers: { Cookie: cookieStore.toString() },
-      cache: "no-store",
-    });
 
-    const session = await res.json();
-    if (session === null) {
-      return { data: null, error: { message: "Session is missing" } };
-    }
-    //   console.log(session);
-    return { data: session, error: null };
-  } catch (error) {
-    console.log(error);
-    return { data: null, error: { message: "Something went wrong" } };
-  }
-};
 const updateUser = async (userId: string, payload: TUpdateUser) => {
   try {
-    const cookieStore = await cookies();
+    // const cookieStore = await cookies();
     const res = await fetch(`${process.env.AUTH_URL}/user/update/${userId}`, {
-      headers: { Cookie: cookieStore.toString() },
+      method: "PATCH",
+      headers: {
+        // Cookie: cookieStore.toString()
+        "content-type": "application/json",
+      },
+      credentials: "include",
       body: JSON.stringify(payload),
       cache: "no-store",
     });
@@ -69,12 +57,13 @@ const signUp = async (payload: {
       headers: {
         "content-type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(payload),
       cache: "no-store",
     });
 
     const data = await res.json();
-    console.log(data);
+    // console.log(data);
     if (data === null) {
       return { data: null, error: { message: "data is missing" } };
     }
@@ -84,4 +73,4 @@ const signUp = async (payload: {
     return { data: null, error: { message: "Something went wrong" } };
   }
 };
-export const user = { getSession, getSpecificUser, updateUser, signUp };
+export const user = { getSpecificUser, updateUser, signUp };

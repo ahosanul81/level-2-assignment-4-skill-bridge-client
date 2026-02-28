@@ -78,6 +78,7 @@ export function UpdateProfileModal() {
   const [categories, setCategories] = useState([]);
   const [slots, setSlots] = useState([]);
   const isAdmin = user?.role === "ADMIN";
+  const isStudent = user?.role === "STUDENT";
 
   useEffect(() => {
     (async () => {
@@ -112,7 +113,7 @@ export function UpdateProfileModal() {
                 </Field>
               )}
             </form.Field>
-            {!isAdmin && (
+            {isAdmin && (
               <>
                 <form.Field name="hourlyRate">
                   {(field) => (
@@ -194,20 +195,20 @@ export function UpdateProfileModal() {
                     </Field>
                   )}
                 </form.Field>
-
-                <form.Field name="bio">
-                  {(field) => (
-                    <Field className="md:col-span-2">
-                      <FieldLabel>Bio</FieldLabel>
-                      <Textarea
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                      />
-                    </Field>
-                  )}
-                </form.Field>
               </>
             )}
+
+            <form.Field name="bio">
+              {(field) => (
+                <Field className="md:col-span-2">
+                  <FieldLabel>Bio</FieldLabel>
+                  <Textarea
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                </Field>
+              )}
+            </form.Field>
 
             <Button type="submit" className="md:col-span-2 w-full">
               Save Changes

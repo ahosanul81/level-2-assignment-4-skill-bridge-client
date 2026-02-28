@@ -42,11 +42,11 @@ export function LoginForm({
       // const res = await auth.login(value);
       const data = await auth.login(value);
       console.log(data.data);
-      if (data.data.success) {
+      if (data?.data?.success) {
         router.push("/");
         toast.success("Logged in successfully");
       } else {
-        toast.error(data.data.message);
+        toast.error(data?.data?.message);
       }
     },
   });

@@ -53,7 +53,7 @@ const signOut = async () => {
     );
 
     const data = await res.json();
-
+    console.log(data);
     return { data: data, error: null };
   } catch (error) {
     console.log(error);
