@@ -15,6 +15,7 @@ export const updateUserAction = async (
   userId: string,
   payload: TUpdateUser,
 ) => {
+  console.log("payload from userAction payload", payload);
   const filterdPayload = removeEmptyKeys(payload);
   try {
     const cookieStore = await cookies();
@@ -33,6 +34,7 @@ export const updateUserAction = async (
     );
 
     const data = await res.json();
+    console.log("payload from userAction payload", data);
     if (data === null) {
       return { data: null, error: { message: "data is missing" } };
     }
