@@ -64,9 +64,9 @@ export function UpdateProfileModal() {
       if (!user) {
         return;
       }
-
+      console.log(value);
       const res = await updateUserAction(user?.id, value);
-
+      console.log(res);
       if (res.data.success) {
         toast.success(res.data.message);
       } else {
