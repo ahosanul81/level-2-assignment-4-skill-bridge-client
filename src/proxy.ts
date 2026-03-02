@@ -17,7 +17,6 @@ export async function proxy(request: NextRequest) {
 
     const pathname = request.nextUrl.pathname;
 
-    // ✅ Redirect root dashboard by role
     if (pathname === "/dashboard") {
       if (payload.role === "ADMIN") {
         return NextResponse.redirect(
@@ -32,7 +31,6 @@ export async function proxy(request: NextRequest) {
       }
     }
 
-    // ✅ Role-based protection
     if (pathname.startsWith("/dashboard/admin") && payload.role !== "ADMIN") {
       return NextResponse.redirect(new URL("/login", request.url));
     }
