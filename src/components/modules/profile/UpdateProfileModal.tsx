@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -44,6 +45,11 @@ const profileSchema = z
 
 export function UpdateProfileModal() {
   const user = useUser();
+  const [open, setOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [slots, setSlots] = useState([]);
+
+  const isTutor = user?.role === "TUTOR";
 
   const form = useForm({
     defaultValues: {
@@ -60,25 +66,19 @@ export function UpdateProfileModal() {
     },
 
     onSubmit: async ({ value }) => {
-      //   console.log("SUBMITTED DATA:", value);
-      if (!user) {
-        return;
-      }
-      console.log(value);
+      if (!user) return;
+
       const res = await updateUserAction(user?.id, value);
-      console.log(res);
-      if (res.data.success) {
+
+      if (res?.data?.success) {
         toast.success(res.data.message);
+        setOpen(false); // ✅ close modal
+        form.reset(); // ✅ reset form
       } else {
-        toast.error(res.data.message);
+        toast.error(res?.data?.message || "Update failed");
       }
     },
   });
-  // if (!user) return;
-  const [categories, setCategories] = useState([]);
-  const [slots, setSlots] = useState([]);
-  const isAdmin = user?.role === "ADMIN";
-  const isStudent = user?.role === "STUDENT";
 
   useEffect(() => {
     (async () => {
@@ -90,9 +90,9 @@ export function UpdateProfileModal() {
   }, []);
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Update Profile</Button>
+        <Button onClick={() => setOpen(true)}>Update Profile</Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -100,8 +100,16 @@ export function UpdateProfileModal() {
           <DialogTitle>Update Tutor Profile</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={form.handleSubmit} className="space-y-6">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+          className="space-y-6"
+        >
           <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Name */}
             <form.Field name="name">
               {(field) => (
                 <Field>
@@ -113,8 +121,10 @@ export function UpdateProfileModal() {
                 </Field>
               )}
             </form.Field>
-            {isAdmin && (
+
+            {isTutor && (
               <>
+                {/* Hourly Rate */}
                 <form.Field name="hourlyRate">
                   {(field) => (
                     <Field>
@@ -129,6 +139,8 @@ export function UpdateProfileModal() {
                     </Field>
                   )}
                 </form.Field>
+
+                {/* Experience */}
                 <form.Field name="experienceYear">
                   {(field) => (
                     <Field>
@@ -144,6 +156,7 @@ export function UpdateProfileModal() {
                   )}
                 </form.Field>
 
+                {/* Category */}
                 <form.Field name="categoryId">
                   {(field) => (
                     <Field>
@@ -156,7 +169,7 @@ export function UpdateProfileModal() {
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                          {categories.map((c: { id: string; name: string }) => (
+                          {categories.map((c: any) => (
                             <SelectItem key={c.id} value={c.id}>
                               {c.name}
                             </SelectItem>
@@ -167,6 +180,7 @@ export function UpdateProfileModal() {
                   )}
                 </form.Field>
 
+                {/* Slot */}
                 <form.Field name="slotId">
                   {(field) => (
                     <Field>
@@ -179,17 +193,11 @@ export function UpdateProfileModal() {
                           <SelectValue placeholder="Select slot" />
                         </SelectTrigger>
                         <SelectContent>
-                          {slots.map(
-                            (s: {
-                              id: string;
-                              startTime: string;
-                              endTime: string;
-                            }) => (
-                              <SelectItem key={s.id} value={s.id}>
-                                {s.startTime} - {s.endTime}
-                              </SelectItem>
-                            ),
-                          )}
+                          {slots.map((s: any) => (
+                            <SelectItem key={s.id} value={s.id}>
+                              {s.startTime} - {s.endTime}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </Field>
@@ -198,6 +206,7 @@ export function UpdateProfileModal() {
               </>
             )}
 
+            {/* Bio */}
             <form.Field name="bio">
               {(field) => (
                 <Field className="md:col-span-2">
