@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 import { TUpdateUser } from "@/types/user";
-import { cookies } from "next/headers";
+// import { cookies } from "next/headers";
 
 function removeEmptyKeys<T extends Record<string, any>>(obj: T): Partial<T> {
   return Object.fromEntries(
@@ -18,15 +18,16 @@ export const updateUserAction = async (
   console.log("payload from userAction payload", payload);
   const filterdPayload = removeEmptyKeys(payload);
   try {
-    const cookieStore = await cookies();
+    // const cookieStore = await cookies();
     const res = await fetch(
       `${process.env.BACKEND_BASE_URL}/user/update/${userId}`,
       {
         method: "PATCH",
         headers: {
           "content-type": "application/json",
-          Cookie: cookieStore.toString(),
+          // Cookie: cookieStore.toString(),
         },
+        // credentials: "include",
         // credentials: "include",
         body: JSON.stringify(filterdPayload),
         cache: "no-store",
