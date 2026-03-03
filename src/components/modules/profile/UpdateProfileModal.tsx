@@ -66,9 +66,9 @@ export function UpdateProfileModal() {
     },
 
     onSubmit: async ({ value }) => {
-      if (!user) return;
+      // if (!user) return;
 
-      const res = await updateUserAction(user?.id, value);
+      const res = await updateUserAction(user?.id as string, value);
 
       if (res?.data?.success) {
         toast.success(res.data.message);
