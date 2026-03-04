@@ -66,14 +66,14 @@ export function UpdateProfileModal() {
     },
 
     onSubmit: async ({ value }) => {
-      // if (!user) return;
+      if (!user) return;
 
       const res = await updateUserAction(user?.id as string, value);
 
       if (res?.data?.success) {
         toast.success(res.data.message);
-        setOpen(false); // ✅ close modal
-        form.reset(); // ✅ reset form
+        setOpen(false);
+        form.reset();
       } else {
         toast.error(res?.data?.message || "Update failed");
       }
